@@ -23,6 +23,13 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/decks/{deck}', [DeckController::class, 'destroy'])->name('decks.destroy');
 
     Route::post('/decks/{deck}/vote', [VoteController::class, 'store'])->name('votes.store');
+
+
+    Route::get('/cards/create', [CardController::class, 'create'])->name('cards.create');
+    Route::post('/cards', [CardController::class, 'store'])->name('cards.store');
+    Route::get('/cards/{card}/edit', [CardController::class, 'edit'])->name('cards.edit');
+    Route::patch('/cards/{card}', [CardController::class, 'update'])->name('cards.update');
+    Route::delete('/cards/{card}', [CardController::class, 'destroy'])->name('cards.destroy');
 });
 
 // --- 3. Route "Wildcard" (Attrape tout lRoute::get('/', [DeckController::class, 'myDecks'])->name('home');e reste après /decks/) ---

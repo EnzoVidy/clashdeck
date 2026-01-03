@@ -9,6 +9,19 @@ use Illuminate\Support\Facades\Auth;
 
 class DeckController extends Controller
 {
+
+    // Méthode Index pour la galerie publique
+    public function index()
+    {
+        $decks = Deck::where('is_public', true)
+            ->with('user')
+            ->orderByDesc('created_at')
+            ->paginate(12);
+
+        return view('welcome', ['decks' => $decks]);
+    }
+
+
     // Affiche les decks de l'utilisateur connecté
     public function myDecks()
     {
@@ -105,14 +118,16 @@ class DeckController extends Controller
 
     // Dans DeckController.php
 
-// Méthode nécessaire pour la partie publique (Etudiant Y),
-// mais utile d'avoir un placeholder pour éviter les erreurs 500
+// Méthode nécessaire pour la partie publique
     public function show(Deck $deck)
-    {
-        // Sera implémenté par l'autre étudiant,
-        // mais tu peux mettre ceci en attendant :
-        return "Détail du deck (A faire par l'étudiant Y)";
-        // return view('decks.show', ['deck' => $deck]);
-    }
+        {
+            if (!$deck->is_public && $deck->user_id !== Auth::id()) {
+                abort(403);
+            }
+
+            $deck->load(['cards', 'user']);
+            
+            return view('decks.show', ['deck' => $deck]);
+        }
 }
 

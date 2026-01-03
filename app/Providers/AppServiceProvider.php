@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 use App\Models\Deck;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('update-deck', function (User $user, Deck $deck) {
             return $user->id === $deck->user_id;
         });
+
+        Gate::define('access-admin', function (User $user) {
+            return $user->is_admin === true;
+        });
+
+        Schema::defaultStringLength(191);
     }
 }
