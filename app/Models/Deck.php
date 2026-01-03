@@ -2,24 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Deck extends Model
 {
-    use HasFactory;
-
+    // Champs autorisés pour la création
     protected $fillable = ['title', 'description', 'is_public', 'user_id'];
 
-    public function user() {
+    // Relation : Un Deck appartient à un User
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function cards() {
-        return $this->belongsToMany(Card::class);
-    }
-
-    public function votes() {
-        return $this->hasMany(Vote::class);
+    // Relation : Un Deck possède plusieurs Cards
+    public function cards(): BelongsToMany
+    {
+        return $this->belongsToMany(Card::class, 'card_deck');
     }
 }
