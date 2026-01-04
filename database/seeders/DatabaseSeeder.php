@@ -27,7 +27,9 @@ class DatabaseSeeder extends Seeder
         User::factory(10)->create([
             'is_admin' => false,
         ]);
-        Card::factory(50)->create();
+
+        $this->call(CardSeeder::class); // seeder pour cartes réelles au lieu du factory pour cartes aléatoires
+        // Card::factory(50)->create();
         Deck::factory(20)->create();
         Vote::factory(50)->create();
 
