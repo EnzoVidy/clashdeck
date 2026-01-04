@@ -1,149 +1,82 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight clash-header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Mes Decks') }}
         </h2>
     </x-slot>
 
-    <div class="clash-decks py-12">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-4">
-                <a href="{{ route('decks.create') }}" class="btn-create">
-                    + Créer un nouveau Deck
-                </a>
+            
+            <div class="action-bar">
+                <a href="{{ route('decks.create') }}" class="btn-create">+ Nouveau Deck</a>
             </div>
 
-            <div class="decks-container">
-                @if($decks->isEmpty())
-                <p>Vous n'avez pas encore créé de deck.</p>
-                @else
-                <table class="decks-table">
-                    <thead>
-                    <tr>
-                        <th>Titre</th>
-                        <th>Visibilité</th>
-                        <th>Date de création</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
+            @if($decks->isEmpty())
+                <div class="empty-state">
+                    <p>Vous n'avez pas encore de deck.</p>
+                    <a href="{{ route('decks.create') }}">Créer le premier</a>
+                </div>
+            @else
+                <div class="my-decks-grid">
                     @foreach ($decks as $deck)
-                    <tr class="deck-row">
-                        <td>{{ $deck->title }}</td>
-                        <td>{{ $deck->is_public ? 'Public' : 'Privé' }}</td>
-                        <td>{{ $deck->created_at->format('d/m/Y') }}</td>
-                        <td class="actions">
-                            <a href="{{ route('decks.edit', $deck) }}" class="edit-btn">Modifier</a>
-                            <form action="{{ route('decks.destroy', $deck) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr ?');">
+                    <div class="my-deck-card">
+                        <div class="card-top">
+                            <h3>{{ $deck->title }}</h3>
+                            <span class="status {{ $deck->is_public ? 'pub' : 'priv' }}">
+                                {{ $deck->is_public ? 'Public' : 'Privé' }}
+                            </span>
+                        </div>
+                        
+                        <p class="date">Créé le {{ $deck->created_at->format('d/m/Y') }}</p>
+
+                        <div class="mini-list">
+                            @foreach($deck->cards->take(8) as $card)
+                                <span class="mini-item">{{ $card->name }}</span>
+                            @endforeach
+                        </div>
+
+                        <div class="card-actions">
+                            <a href="{{ route('decks.edit', $deck) }}" class="link-edit">Modifier</a>
+                            
+                            <form action="{{ route('decks.destroy', $deck) }}" method="POST" onsubmit="return confirm('Sûr ?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="delete-btn">Supprimer</button>
+                                <button type="submit" class="btn-delete">Supprimer</button>
                             </form>
-                        </td>
-                    </tr>
+                        </div>
+                    </div>
                     @endforeach
-                    </tbody>
-                </table>
-                @endif
-            </div>
+                </div>
+            @endif
         </div>
     </div>
 
     <style>
-        /* Container général */
-        .clash-decks {
-            font-family: 'Verdana', sans-serif;
-            background: linear-gradient(to bottom, #f9f2e7, #ffd700);
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 1000px;
-            margin: auto;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
+        .action-bar { margin-bottom: 20px; text-align: right; }
+        .btn-create { background: #b22222; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold; }
+        .btn-create:hover { background: #900; }
 
-        /* Header */
-        .clash-header {
-            color: #b22222;
-            text-shadow: 2px 2px #ffeaa7;
-            text-align: center;
-        }
+        .empty-state { background: white; padding: 20px; text-align: center; border-radius: 8px; }
 
-        /* Bouton créer */
-        .btn-create {
-            background-color: #b22222;
-            color: #fff;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: transform 0.2s, background-color 0.2s;
-        }
-        .btn-create:hover {
-            background-color: #ff4500;
-            transform: scale(1.05);
-        }
+        .my-decks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        .my-deck-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-left: 5px solid #f1c40f; }
+        
+        .card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .card-top h3 { margin: 0; color: #333; font-size: 1.2em; }
+        
+        .status { font-size: 0.8em; padding: 2px 6px; border-radius: 4px; }
+        .status.pub { background: #e6fffa; color: green; }
+        .status.priv { background: #eee; color: #666; }
+        
+        .date { font-size: 0.8em; color: #888; margin-bottom: 10px; }
 
-        /* Table des decks */
-        .decks-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .mini-list { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+        .mini-item { font-size: 0.7em; background: #eee; padding: 2px 5px; border-radius: 3px; border: 1px solid #ddd; }
 
-        .decks-table thead tr {
-            background: linear-gradient(to right, #f1c40f, #f39c12);
-            color: #fff;
-        }
-
-        .decks-table th, .decks-table td {
-            padding: 12px;
-            text-align: left;
-        }
-
-        .deck-row {
-            background-color: #fff9e6;
-            border: 2px solid #f39c12;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .deck-row:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        /* Actions */
-        .actions {
-            display: flex;
-            gap: 10px;
-        }
-        .edit-btn {
-            color: #1e90ff;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.2s;
-        }
-        .edit-btn:hover {
-            color: #104e8b;
-        }
-
-        .delete-btn {
-            color: #ff4500;
-            background: none;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s, transform 0.2s;
-        }
-        .delete-btn:hover {
-            color: #b22222;
-            transform: scale(1.05);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .actions {
-                flex-direction: column;
-            }
-        }
+        .card-actions { display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 10px; }
+        .link-edit { color: blue; font-weight: bold; }
+        .btn-delete { color: red; background: none; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </x-app-layout>

@@ -14,13 +14,12 @@ class DeckController extends Controller
     public function index()
     {
         $decks = Deck::where('is_public', true)
-            ->with('user')
+            ->with(['user', 'cards', 'votes'])
             ->orderByDesc('created_at')
             ->paginate(12);
 
         return view('welcome', ['decks' => $decks]);
     }
-
 
     // Affiche les decks de l'utilisateur connecté
     public function myDecks()
@@ -116,18 +115,30 @@ class DeckController extends Controller
         return redirect('/my-decks');
     }
 
-    // Dans DeckController.php
-
-// Méthode nécessaire pour la partie publique
+    // Méthode nécessaire pour la partie publique
     public function show(Deck $deck)
-        {
-            if (!$deck->is_public && $deck->user_id !== Auth::id()) {
-                abort(403);
-            }
-
-            $deck->load(['cards', 'user']);
-            
-            return view('decks.show', ['deck' => $deck]);
+    {
+        if (!$deck->is_public && $deck->user_id !== Auth::id()) {
+            abort(403);
         }
+        
+        $deck->load(['cards', 'user', 'votes']); 
+        
+        return view('decks.show', ['deck' => $deck]);
+    }
+    
+    public function publicProfile(\App\Models\User $user)
+    {
+        $decks = $user->decks()
+                      ->where('is_public', true)
+                      ->with(['cards', 'votes'])
+                      ->orderByDesc('created_at')
+                      ->get();
+
+        return view('profile.public', [
+            'user' => $user,
+            'decks' => $decks
+        ]);
+    }
 }
 

@@ -1,11 +1,11 @@
-<section>
+<section style="background-color: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border-top: 4px solid #b22222;">
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+        <h2 style="font-family: 'Bangers', cursive; letter-spacing: 1px; color: #b22222; font-size: 1.5rem; font-weight: 500;">
+            {{ __('Informations du Profil') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Mettez à jour les informations de votre compte, votre pseudo de joueur et votre email.") }}
         </p>
     </header>
 
@@ -18,29 +18,53 @@
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <label for="name" class="block font-bold text-gray-700 mb-1">{{ __('Nom d\'utilisateur') }}</label>
+            <input id="name" name="name" type="text" 
+                   style="width: 100%; border: 2px solid #d1d5db; padding: 0.5rem; border-radius: 0.5rem;"
+                   class="focus:outline-none focus:border-red-600 transition" 
+                   value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <label for="player_tag" class="block font-bold text-gray-700 mb-1">{{ __('Tag Joueur (ex: #J89PLLQR)') }}</label>
+            <input id="player_tag" name="player_tag" type="text" 
+                   style="width: 100%; border: 2px solid #d1d5db; padding: 0.5rem; border-radius: 0.5rem; text-transform: uppercase; font-family: monospace;"
+                   class="focus:outline-none focus:border-red-600 transition" 
+                   value="{{ old('player_tag', $user->player_tag) }}" />
+            <x-input-error class="mt-2" :messages="$errors->get('player_tag')" />
+        </div>
+
+        <div>
+            <label for="bio" class="block font-bold text-gray-700 mb-1">{{ __('Biographie') }}</label>
+            <textarea id="bio" name="bio" rows="3" 
+                      style="width: 100%; border: 2px solid #d1d5db; padding: 0.5rem; border-radius: 0.5rem;"
+                      class="focus:outline-none focus:border-red-600 transition" 
+                      placeholder="Parlez-nous de votre style de jeu...">{{ old('bio', $user->bio) }}</textarea>
+            <x-input-error class="mt-2" :messages="$errors->get('bio')" />
+        </div>
+
+        <div>
+            <label for="email" class="block font-bold text-gray-700 mb-1">{{ __('Adresse Email') }}</label>
+            <input id="email" name="email" type="email" 
+                   style="width: 100%; border: 2px solid #d1d5db; padding: 0.5rem; border-radius: 0.5rem;"
+                   class="focus:outline-none focus:border-red-600 transition" 
+                   value="{{ old('email', $user->email) }}" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
                     <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
+                        {{ __('Votre adresse email n\'est pas vérifiée.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
+                        <button form="send-verification" style="color: #b22222; text-decoration: underline;" class="text-sm hover:text-red-800 rounded-md focus:outline-none">
+                            {{ __('Cliquez ici pour renvoyer l\'email de vérification.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
+                            {{ __('Un nouveau lien de vérification a été envoyé à votre adresse email.') }}
                         </p>
                     @endif
                 </div>
@@ -48,7 +72,11 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <button type="submit" 
+                    style="background-color: #b22222; color: white; font-weight: bold; padding: 10px 24px; border-radius: 0.25rem; border-bottom: 4px solid #800000; cursor: pointer;"
+                    class="shadow hover:opacity-90 transition active:border-0 active:translate-y-1">
+                {{ __('SAUVEGARDER') }}
+            </button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -56,8 +84,8 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                    class="text-sm text-green-600 font-bold"
+                >{{ __('Modifications enregistrées.') }}</p>
             @endif
         </div>
     </form>
