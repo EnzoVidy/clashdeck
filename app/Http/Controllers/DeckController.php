@@ -11,12 +11,22 @@ class DeckController extends Controller
 {
 
     // Méthode Index pour la galerie publique
-    public function index()
+    public function index(Request $request)
     {
-        $decks = Deck::where('is_public', true)
+        $query = Deck::where('is_public', true)
             ->with(['user', 'cards', 'votes'])
-            ->orderByDesc('created_at')
-            ->paginate(12);
+            ->withAvg('cards', 'elixir_cost');
+
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+
+        if ($sort === 'avg_cost') {
+            $query->orderBy('cards_avg_elixir_cost', $direction);
+        } elseif (in_array($sort, ['title', 'created_at'])) {
+            $query->orderBy($sort, $direction);
+        }
+
+        $decks = $query->paginate(12)->withQueryString();
 
         return view('welcome', ['decks' => $decks]);
     }

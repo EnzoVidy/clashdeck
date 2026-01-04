@@ -9,11 +9,25 @@ use Illuminate\Support\Facades\Gate;
 
 class CardController extends Controller
 {
-    public function index()
-    {
-        $cards = Card::all();
-        return view('cards.index', ['cards' => $cards]);
+    public function index(Request $request)
+{
+    $query = Card::query();
+
+    if ($request->filled('rarity')) {
+        $query->where('rarity', $request->rarity);
     }
+
+    $sort = $request->get('sort', 'name'); 
+    $direction = $request->get('direction', 'asc');
+
+    if (in_array($sort, ['name', 'elixir_cost', 'created_at'])) {
+        $query->orderBy($sort, $direction);
+    }
+
+    $cards = $query->get();
+
+    return view('cards.index', ['cards' => $cards]);
+}
 
     public function create()
     {

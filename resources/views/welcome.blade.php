@@ -19,6 +19,31 @@
         <p class="hero-subtitle">Votez pour vos compositions préférées !</p>
     </header>
 
+        <form action="{{ route('home') }}" method="GET" class="mb-8 flex flex-wrap gap-4 bg-gray-100 p-6 rounded-lg shadow-sm">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Trier par :</label>
+                <select name="sort" class="rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Date</option>
+                    <option value="title" {{ request('sort') == 'title' ? 'selected' : '' }}>Nom du deck</option>
+                    <option value="avg_cost" {{ request('sort') == 'avg_cost' ? 'selected' : '' }}>Coût moyen</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ordre :</label>
+                <select name="direction" class="rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="desc" {{ request('direction') == 'desc' ? 'selected' : '' }}>Décroissant</option>
+                    <option value="asc" {{ request('direction') == 'asc' ? 'selected' : '' }}>Croissant</option>
+                </select>
+            </div>
+
+            <div class="flex items-end">
+                <x-primary-button type="submit">
+                    {{ __('Filtrer') }}
+                </x-primary-button>
+            </div>
+        </form>
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="deck-grid">
             @foreach ($decks as $deck)
